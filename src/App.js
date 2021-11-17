@@ -14,8 +14,8 @@ class App extends React.Component {
 	}
 
 	getWeatherData() {
-		const baseURL = `https://api.openweathermap.org/data/2.5/weather?q=${this.state
-			.location}&appid=b5bbc1c8b1451890f01d16cbf82acee5&units=imperial`;
+		const weatherKey = '7f13363208d231b2f04ae1048a6fb59d';
+		const baseURL = `https://api.openweathermap.org/data/2.5/weather?q=${this.state.location}&appid=${weatherKey}`;
 		axios
 			.get(baseURL)
 			.then((response) => {
