@@ -1,22 +1,23 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
+import { Form, Col, Button, Row } from 'react-bootstrap';
 
 class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			location: 'Santa Barbara',
-			temperature: 65
+			temperature: null
 		};
+		this.onFormSubmit = this.onFormSubmit.bind(this);
 	}
 
-	componentDidMount() {
+	getWeatherData() {
+		const baseURL = `https://api.openweathermap.org/data/2.5/weather?q=${this.state
+			.location}&appid=b5bbc1c8b1451890f01d16cbf82acee5&units=imperial`;
 		axios
-			.get(
-				`https://api.openweathermap.org/data/2.5/weather?q=${this.state
-					.location}&appid=b5bbc1c8b1451890f01d16cbf82acee5&units=imperial`
-			)
+			.get(baseURL)
 			.then((response) => {
 				this.setState({
 					location: response.data.name,
@@ -27,25 +28,49 @@ class App extends React.Component {
 			})
 			.catch((error) => {
 				console.log(error);
+				this.setState({
+					location: 'Location Not Found',
+					temperature: null
+				});
 			});
+	}
+
+	componentDidMount() {
+		this.getWeatherData();
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.location !== this.state.location) {
+			this.getWeatherData();
+		}
+	}
+
+	onFormSubmit(event) {
+		event.preventDefault();
+		const searchTerm = event.target.searchTerm.value;
+		this.setState({
+			location: searchTerm
+		});
+		console.log(searchTerm);
 	}
 
 	render() {
 		return (
 			<div className="container d-flex flex-column align-items-center">
-				<div className="input-group input-group-sm mt-5 mb-5">
-					<div className="input-group-prepend">
-						<span className="input-group-text" id="inputGroup-sizing-sm">
-							Location
-						</span>
-					</div>
-					<input
-						type="text"
-						className="form-control"
-						aria-label="Small"
-						aria-describedby="inputGroup-sizing-sm"
-					/>
-				</div>
+				<Form onSubmit={this.onFormSubmit}>
+					<Form.Group as={Row} className="d- flex align-items-center justify-content-center">
+						<Col sm={3} className="my-3">
+							<Form.Label htmlFor="inlineFormInputName" visuallyHidden>
+								Locaion
+							</Form.Label>
+							<Form.Control id="searchTerm" placeholder="Location" />
+						</Col>
+						<Col xs="auto" className="my-1">
+							<Button type="submit">Submit</Button>
+						</Col>
+					</Form.Group>
+				</Form>
+
 				<div className="d-flex flex-column justify-content-center align-items-center mt-5 mb-auto">
 					<h1>{this.state.temperature}</h1>
 
